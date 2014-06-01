@@ -1,5 +1,6 @@
 {
   "name": "mathgame",
+  "subdomain": "themathgame",
   "version": "0.0.0",
   "dependencies": {
     "body-parser": "~1.0.0",
