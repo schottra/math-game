@@ -1,6 +1,10 @@
 'use strict'
 
 angular.module('mathGameApp')
-  .controller 'MainCtrl', ($scope, $http) ->
-    $http.get('/api/awesomeThings').success (awesomeThings) ->
-      $scope.awesomeThings = awesomeThings
+  .controller 'MainCtrl', ($scope, $location) ->
+    class MainController
+      newGame: ->
+        console.log 'snarf'
+        $location.url '/play'
+
+    $scope.main = new MainController()

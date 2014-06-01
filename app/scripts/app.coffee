@@ -11,6 +11,9 @@ angular.module('mathGameApp', [
       .when '/',
         templateUrl: 'partials/main'
         controller: 'MainCtrl'
+      .when '/play',
+        templateUrl: 'partials/play'
+        controller: 'PlayCtrl'
       
       .otherwise
         redirectTo: '/'
