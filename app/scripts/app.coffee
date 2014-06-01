@@ -11,7 +11,7 @@ angular.module('mathGameApp', [
       .when '/',
         templateUrl: 'partials/main'
         controller: 'MainCtrl'
-      .when '/play',
+      .when '/play/:gameId',
         templateUrl: 'partials/play'
         controller: 'PlayCtrl'
       

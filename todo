@@ -1,0 +1,35 @@
+- Generate games id when new game started
+- Persist game id when creating game (db?)
+- only allow connections to sockets with games that exist
+- play controller can accept game id as parameter and connect to existing game
+  - otherwise it will make API call to create a new game and then connect to it
+
+
+
+*Gameplay*
+- Ask user to input a name when they join a game
+  - Allow duplicate names (append a number)
+  - Random name generation if the user chooses to be anonymous
+- Create a question generator
+  - Take X random operands and generate a random operator?
+  - Validate client input before sending
+  - Have configurable difficulty levels
+    - Increase (possible) digits per operand
+    - Increase number of operations
+- Count-up timer when question has been presented?
+- Maximum time per question?
+- Figure out how to handle answer submission priority
+  - Start with in-memory storage of all game data.
+  - Drop answers into a message queue, process one by one, throw away messages once correctly answered?
+    - redis has pub/sub and queues
+    - Use separate handler for processing the queue
+    - Would require that one server be responsible for handling all messages for each game
+  - Use key/value to set a "status" flag for questions while active, use its state to synchronize processing of answers?
+
+*State/Records*
+- Use Mongoose
+- Persist results of each question
+- Each client should be able to see the scores of the other players
+- When a new client connects, they need to be able to retrieve the current game status
+- Store game history, so users can browse previous game results
+
