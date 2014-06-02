@@ -52,7 +52,11 @@ module.exports = function (grunt) {
         tasks: ['newer:coffee:dist']
       },
       coffeeTest: {
-        files: ['test/client/spec/{,*/}*.{coffee,litcoffee,coffee.md}'],
+        files: [
+            '<%= yeoman.app %>/scripts/{,*/}*.{coffee,litcoffee,coffee.md}',
+            'test/client/spec/{,*/}*.{coffee,litcoffee,coffee.md}',
+            'test/client/mock/{,*/}*.coffee'
+        ],
         tasks: ['newer:coffee:test', 'karma']
       },
       compass: {
@@ -208,6 +212,12 @@ module.exports = function (grunt) {
           cwd: 'test/client/spec',
           src: '{,*/}*.coffee',
           dest: '.tmp/client/spec',
+          ext: '.js'
+        },{
+          expand: true,
+          cwd: 'test/client/mock',
+          src: '{,*/}*.coffee',
+          dest: '.tmp/client/mock',
           ext: '.js'
         }]
       }

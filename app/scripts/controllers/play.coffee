@@ -19,11 +19,6 @@ angular.module('mathGameApp')
           socket.join(gameId)
 
 
-
-
-
-
-
     return new PlayController()
 
 
