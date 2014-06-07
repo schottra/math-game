@@ -1,7 +1,8 @@
 'use strict';
 
 var should = require('should'),
-    app = require('../../../server'),
+    app = _setup.server(),
+    sinon = require('sinon'),
     request = require('supertest');
 
 describe('POST /api/game', function() {
@@ -27,4 +28,19 @@ describe('POST /api/game', function() {
             });
 
     });
+
+    it('should insert a game into the data store', function(done) {
+        var spy = sinon.spy(app.gameRepository, 'createGame');
+        request(app)
+            .post('/api/game')
+            .end(function() {
+                spy.calledWith(sinon.match.has('id', sinon.match.string)).should.be.ok;
+                done();
+            });
+
+    });
+
+//    it('should pass required values when adding a user to a game', function(){
+//
+//    });
 });

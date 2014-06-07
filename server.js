@@ -15,6 +15,7 @@ var config = require('./lib/config/config');
 var app = express();
 require('./lib/config/express')(app);
 require('./lib/routes')(app);
+require('./lib/repositories')(app);
 
 // Start server
 var server = app.listen(config.port, config.ip, function () {
@@ -23,10 +24,7 @@ var server = app.listen(config.port, config.ip, function () {
 
 // Setup socket
 var io = require('socket.io').listen(server);
-
-io.on('connection', function (socket) {
-    console.log("client connected");
-});
+require('./lib/sockets')(io, app);
 
 // Expose app
 exports = module.exports = app;

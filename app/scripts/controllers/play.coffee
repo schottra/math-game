@@ -14,9 +14,12 @@ angular.module('mathGameApp')
 
     class PlayController
       constructor: ->
+        @userName= 'User'
         openSocket()
-        .then ->
+        .then =>
+          socket.emit('joinGame', {gameId, userName: @userName})
           socket.join(gameId)
+
 
 
     return new PlayController()

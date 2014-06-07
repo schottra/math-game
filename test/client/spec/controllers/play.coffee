@@ -21,6 +21,8 @@ describe 'Controller: PlayCtrl', () ->
     window.io = -> socket
     spyOn(window, 'io').and.callThrough()
     spyOn(socket, 'on').and.callThrough()
+    spyOn(socket, 'in').and.returnValue(socket)
+    spyOn(socket, 'emit').and.callThrough()
 
     routeParams.gameId = 'randomString'
 
@@ -33,6 +35,7 @@ describe 'Controller: PlayCtrl', () ->
   afterEach ->
     window.io = null
 
+
   it 'should connect to the game socket', ->
     expect(window.io).toHaveBeenCalledWith('/game')
 
@@ -41,4 +44,10 @@ describe 'Controller: PlayCtrl', () ->
     socket.listeners['connect'][0]()
     scope.$digest()
     expect(socket.join).toHaveBeenCalledWith('randomString')
+
+  it 'should emit a join message for the game after connecting', ->
+    socket.listeners['connect'][0]()
+    scope.$digest()
+    expect(socket.emit).toHaveBeenCalledWith('joinGame',
+      jasmine.objectContaining({userName: PlayCtrl.userName, gameId: 'randomString'}))
 

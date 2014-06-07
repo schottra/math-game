@@ -1,10 +1,6 @@
-- Generate games id when new game started
 - Persist game id when creating game (db?)
-- only allow connections to sockets with games that exist
-- play controller can accept game id as parameter and connect to existing game
-  - otherwise it will make API call to create a new game and then connect to it
-
-
+- Make socket handlers available to API so a new handler can be registered for each room
+  when games are created.
 
 *Gameplay*
 - Ask user to input a name when they join a game
@@ -18,6 +14,7 @@
     - Increase number of operations
 - Count-up timer when question has been presented?
 - Maximum time per question?
+- When a question starts, focus the answer box so user can type answer and hit enter
 - Figure out how to handle answer submission priority
   - Start with in-memory storage of all game data.
   - Drop answers into a message queue, process one by one, throw away messages once correctly answered?
@@ -27,6 +24,8 @@
   - Use key/value to set a "status" flag for questions while active, use its state to synchronize processing of answers?
 
 *State/Records*
+- Use separate collections for games and questions
+  - Questions can store their state
 - Use Mongoose
 - Persist results of each question
 - Each client should be able to see the scores of the other players
