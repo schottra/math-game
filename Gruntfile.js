@@ -461,7 +461,7 @@ module.exports = function (grunt) {
       options: {
         reporter: 'spec'
       },
-      require: ['test/server/setup.js'],
+      require: ['test/server/shouldExtensions.js', 'test/server/setup.js'],
       src: ['test/server/spec/*{,/*}.js']
     },
 

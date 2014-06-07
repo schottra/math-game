@@ -6,22 +6,37 @@ var should = require('should'),
     gameRepository = _setup.getRepository('gameRepository');
 
 describe('Game Repository', function(){
-    var app = {};
     var repo = {};
 
     beforeEach(function(){
-        app = {};
-        repo = gameRepository(app);
+        repo = gameRepository();
     });
 
 
     it('should reject if adding user to game that does not exist', function(){
-        repo.addUserToGame({gameId: 'invalid', userName: 'user1'}).isRejected().should.be.true;
+        return repo.addUserToGame({gameId: 'invalid', userName: 'user1'}).should.reject()
     });
 
-    it('should resolve is adding user to game that exists', function(){
-        repo.createGame({gameId: 'validId'});
-        repo.addUserToGame({gameId: 'validId', userName: 'user1'}).isResolved().should.be.true;
+    it('should resolve if adding user to game that exists', function(){
+        return repo.createGame({id: 'validId'})
+        .then(function(){
+            repo.addUserToGame({gameId: 'validId', userName: 'user1'});
+        }).should.resolve()
+    });
+
+    it('should allow retrieving a game record by id', function(){
+        var game = {id: 'validId'};
+        return repo.createGame(game)
+        .then(function() {
+            return repo.getGame('validId');
+        })
+        .then(function(returnedGame){
+            returnedGame.should.eql(game);
+        });
+    });
+
+    it('should reject when retrieving non-existent game', function(){
+        return repo.getGame('invalidId').should.reject()
     });
 
 //    it('should correctly add new users to game record', function () {

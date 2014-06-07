@@ -1,6 +1,4 @@
 - Persist game id when creating game (db?)
-- Make socket handlers available to API so a new handler can be registered for each room
-  when games are created.
 
 *Gameplay*
 - Ask user to input a name when they join a game
