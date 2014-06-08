@@ -1,11 +1,12 @@
 "use strict";
 
-var sinon = require('sinon');
+var sinon = require('sinon'),
+    q = require('q');
 
 module.exports = function(){
     return{
-        createGame: sinon.stub(),
-        addUserToGame: sinon.stub(),
-        getGame: sinon.stub()
+        createGame: sinon.stub().returns(q()),
+        addUserToGame: sinon.stub().returns(q()),
+        getGame: sinon.stub().returns(q())
     }
 };

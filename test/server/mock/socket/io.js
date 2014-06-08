@@ -8,7 +8,8 @@ module.exports = function(){
         on: function(event, fn){
             this.listeners[event] = fn;
         },
-        of: sinon.stub()
+        of: sinon.stub(),
+        emit: sinon.stub()
     };
     sinon.spy(mock, 'on');
     return mock;
