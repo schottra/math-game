@@ -8,6 +8,7 @@ module.exports = function(){
         on: function(event, fn){
             this.listeners[event] = fn;
         },
+        in: sinon.stub(),
         of: sinon.stub(),
         emit: sinon.stub()
     };

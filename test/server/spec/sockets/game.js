@@ -11,6 +11,7 @@ describe('Game Socket', function () {
     var app = {},
         io = {},
         gameNamespace = {},
+        room = {},
         socket = {} ;
 
     beforeEach(function () {
@@ -19,6 +20,7 @@ describe('Game Socket', function () {
         };
         io = ioMock();
         gameNamespace = ioMock();
+        room = ioMock();
         socket = ioMock();
         socket.id = 'validSocketId';
 
@@ -32,16 +34,19 @@ describe('Game Socket', function () {
     };
 
     it('should attach to the correct namespace', function () {
-        io.of.calledWith('/game').should.be.true;
+        io.of.should.have.been.calledWith('/game');
     });
 
     it('should listen for joinGame events', function(){
         connectSocket();
-        socket.on.calledWith('joinGame').should.be.true;
+        socket.on.should.have.been.calledWith('joinGame');
     });
 
     describe('with connected socket', function () {
         beforeEach(connectSocket);
+        beforeEach(function () {
+            gameNamespace.in.withArgs('validGameId').returns(room);
+        });
 
         it('should pass required values when adding a user to a game', function(){
             socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'});
@@ -55,7 +60,7 @@ describe('Game Socket', function () {
         it('should emit a success message to socket when user join succeeds', function(){
             return socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'})
             .finally(function(){
-                socket.emit.calledWith('joinGame success').should.be.true;
+                socket.emit.should.have.been.calledWith('joinGame success');
             });
         });
 
@@ -63,11 +68,17 @@ describe('Game Socket', function () {
             app.gameRepository.addUserToGame.returns(q.reject());
             return socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'})
             .finally(function(){
-                socket.emit.calledWith('joinGame failed').should.be.true;
+                socket.emit.should.have.been.calledWith('joinGame failed');
             });
         });
 
         it('should emit a message to game room when a user joins', function(){
+
+            return socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'})
+            .finally(function(){
+                room.emit.should.have.been.calledWith('userJoined');
+                room.emit.firstCall.args[1].should.eql({userId: socket.id, userName: 'user1'});
+            });
 
         });
 

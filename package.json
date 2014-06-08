@@ -67,6 +67,7 @@
     "requirejs": "~2.1.13",
     "should": "~4.0.0",
     "sinon": "^1.10.2",
+    "sinon-chai": "^2.5.0",
     "supertest": "~0.13.0",
     "time-grunt": "~0.3.1"
   },

@@ -46,7 +46,7 @@ describe('POST /api/game', function() {
         request(app)
             .post('/api/game')
             .end(function() {
-                spy.called.should.be.ok;
+                spy.should.have.been.called;
                 done();
             });
 

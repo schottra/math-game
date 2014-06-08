@@ -2,11 +2,13 @@
 
 var chai = require('chai'),
     chaiAsPromised = require('chai-as-promised'),
+    sinonChai = require('sinon-chai'),
     path = require('path'),
     baseDir = '../../',
     libDir = '../../lib';
 
 chai.use(chaiAsPromised);
+chai.use(sinonChai);
 
 global._setup = {
     requireServer: function(){
