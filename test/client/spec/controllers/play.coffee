@@ -11,6 +11,7 @@ describe 'Controller: PlayCtrl', () ->
   $httpBackend = {}
   routeParams = {}
   socket = {}
+  window = {}
 
   # Initialize the controller and a mock scope
   beforeEach inject (_$httpBackend_, $controller, $rootScope) ->
@@ -30,6 +31,7 @@ describe 'Controller: PlayCtrl', () ->
     PlayCtrl = $controller 'PlayCtrl', {
       $scope: scope
       $routeParams: routeParams
+      $window: window
     }
 
   afterEach ->
