@@ -1,7 +1,7 @@
 'use strict';
 
 var should = require('chai').should(),
-    app = _setup.server(),
+    app = _setup.requireServer(),
     sinon = require('sinon'),
     q = require('q'),
     request = require('supertest');

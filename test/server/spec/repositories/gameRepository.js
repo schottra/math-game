@@ -3,7 +3,7 @@
 var should = require('chai').should(),
     sinon = require('sinon'),
     q = require('q'),
-    gameRepository = _setup.getRepository('gameRepository');
+    gameRepository = _setup.requireRepository('gameRepository');
 
 describe('Game Repository', function(){
     var repo = {};

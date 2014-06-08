@@ -1,16 +1,29 @@
 "use strict";
 
 var chai = require('chai'),
-    chaiAsPromised = require('chai-as-promised');
+    chaiAsPromised = require('chai-as-promised'),
+    path = require('path'),
+    baseDir = '../../',
+    libDir = '../../lib';
 
 chai.use(chaiAsPromised);
 
 global._setup = {
-    server: function(){
-        return require('../../server');
+    requireServer: function(){
+        return require(path.join(baseDir, 'server'));
     },
 
-    getRepository: function(repositoryName){
-        return require('../../lib/repositories/'+repositoryName);
+    requireRepository: function(repositoryName){
+        return require(path.join(libDir, 'repositories', repositoryName ));
+    },
+
+    requireSocket: function(socketName){
+        return require(path.join(libDir, 'sockets', socketName));
+    },
+
+    requireMock: function(mockName){
+        var mockPath = path.join(__dirname, 'mock', mockName);
+        console.log("Looking for mock: ", mockPath);
+        return require(mockPath);
     }
 };
