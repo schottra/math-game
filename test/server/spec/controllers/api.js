@@ -3,9 +3,19 @@
 var should = require('should'),
     app = _setup.server(),
     sinon = require('sinon'),
+    q = require('q'),
     request = require('supertest');
 
 describe('POST /api/game', function() {
+    var sandbox;
+
+    beforeEach(function(){
+        sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(function(){
+        sandbox.restore();
+    });
 
     it('should respond with JSON object', function(done) {
         request(app)
@@ -20,21 +30,23 @@ describe('POST /api/game', function() {
     });
 
     it('should return an object containing an id as a string', function(done) {
+        var stub = sandbox.stub(app.gameRepository, 'createGame');
+        stub.returns(q({id: 'validId'}));
         request(app)
             .post('/api/game')
             .end(function(err,res) {
-               res.body.should.have.property('id').type('string');
+               res.body.should.have.property('id').eql('validId');
                 done();
             });
 
     });
 
     it('should insert a game into the data store', function(done) {
-        var spy = sinon.spy(app.gameRepository, 'createGame');
+        var spy = sandbox.spy(app.gameRepository, 'createGame');
         request(app)
             .post('/api/game')
             .end(function() {
-                spy.calledWith(sinon.match.has('id', sinon.match.string)).should.be.ok;
+                spy.called.should.be.ok;
                 done();
             });
 

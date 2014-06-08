@@ -12,26 +12,30 @@ describe('Game Repository', function(){
         repo = gameRepository();
     });
 
+    it('should generate an id when creating a game', function () {
+        repo.createGame().then( function(game){
+            game.should.have.property('id').type('string');
+        });
+    });
 
     it('should reject if adding user to game that does not exist', function(){
         return repo.addUserToGame({gameId: 'invalid', userName: 'user1'}).should.reject()
     });
 
     it('should resolve if adding user to game that exists', function(){
-        return repo.createGame({id: 'validId'})
-        .then(function(){
-            repo.addUserToGame({gameId: 'validId', userName: 'user1'});
-        }).should.resolve()
+        return repo.createGame()
+        .then(function(game){
+            return repo.addUserToGame({gameId: game.id, userName: 'user1'});
+        })
     });
 
     it('should allow retrieving a game record by id', function(){
-        var game = {id: 'validId'};
-        return repo.createGame(game)
-        .then(function() {
-            return repo.getGame('validId');
-        })
-        .then(function(returnedGame){
-            returnedGame.should.eql(game);
+        return repo.createGame()
+        .then(function(game) {
+            return repo.getGame(game.id)
+            .then(function(returnedGame){
+                returnedGame.should.eql(game);
+            });
         });
     });
 
