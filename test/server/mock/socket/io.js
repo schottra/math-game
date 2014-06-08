@@ -6,11 +6,10 @@ module.exports = function(){
     var mock = {
         listeners: {},
         on: function(event, fn){
-            mock.listeners[event] = fn;
+            this.listeners[event] = fn;
         },
         of: sinon.stub()
     };
-
-    sinon.stub(mock, "on");
+    sinon.spy(mock, 'on');
     return mock;
 };

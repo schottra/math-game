@@ -51,8 +51,4 @@ describe('POST /api/game', function() {
             });
 
     });
-
-//    it('should pass required values when adding a user to a game', function(){
-//
-//    });
 });
