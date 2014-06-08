@@ -37,9 +37,10 @@ describe('Game Socket', function () {
         io.of.should.have.been.calledWith('/game');
     });
 
-    it('should listen for joinGame events', function(){
+    it('should listen for game events', function(){
         connectSocket();
         socket.on.should.have.been.calledWith('joinGame');
+        socket.on.should.have.been.calledWith('leaveGame');
     });
 
     describe('with connected socket', function () {
@@ -73,17 +74,19 @@ describe('Game Socket', function () {
         });
 
         it('should emit a message to game room when a user joins', function(){
-
             return socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'})
             .finally(function(){
                 room.emit.should.have.been.calledWith('userJoined');
                 room.emit.firstCall.args[1].should.eql({userId: socket.id, userName: 'user1'});
             });
-
         });
 
         it('should emit a message to game room when a user leaves', function () {
-
+            return socket.listeners['leaveGame']({gameId: 'validGameId'})
+            .finally(function(){
+                room.emit.should.have.been.calledWith('userLeft');
+                room.emit.firstCall.args[1].should.eql({userId: socket.id});
+            });
         });
     });
 });
