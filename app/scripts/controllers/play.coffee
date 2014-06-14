@@ -18,7 +18,7 @@ angular.module('mathGameApp')
         @userName= "User"
         openSocket()
         .then =>
-          socket.emit('joinGame', {gameId, userName: @userName}, @_onJoinSucceeded)
+          socket.emit('joinGame', {gameId, userName: @userName}, @_onJoinResponse)
           socket.on('userJoined', @_onUserJoined)
           socket.on('userLeft', @_onUserLeft)
 
@@ -29,8 +29,10 @@ angular.module('mathGameApp')
         $timeout =>
           delete @players[userId]
 
-      _onJoinSucceeded: (gameData)=>
-        $timeout( => @players = gameData.players )
+      _onJoinResponse: (response)=>
+        if response instanceof Error then return $location.url('/')
+
+        $timeout( => @players = response.players )
 
 
     ctrl = new PlayController()

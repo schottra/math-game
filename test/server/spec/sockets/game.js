@@ -23,6 +23,7 @@ describe('Game Socket', function () {
         room = ioMock();
         socket = ioMock();
         socket.id = 'validSocketId';
+        socket.rooms = [];
 
         io.of.returns(gameNamespace);
 
@@ -40,7 +41,7 @@ describe('Game Socket', function () {
     it('should listen for game events', function(){
         connectSocket();
         socket.on.should.have.been.calledWith('joinGame');
-        socket.on.should.have.been.calledWith('leaveGame');
+        socket.on.should.have.been.calledWith('disconnect');
     });
 
     describe('with connected socket', function () {
@@ -70,9 +71,10 @@ describe('Game Socket', function () {
 
         it('should emit a failure message to socket when user join fails', function () {
             app.gameRepository.addUserToGame.returns(q.reject());
-            return socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'})
+            var callback = sinon.stub();
+            return socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'}, callback)
             .finally(function(){
-                socket.emit.should.have.been.calledWith('joinGame failed');
+                callback.should.have.been.calledWith(sinon.match.instanceOf(Error));
             });
         });
 
@@ -85,11 +87,16 @@ describe('Game Socket', function () {
         });
 
         it('should emit a message to game room when a user leaves', function () {
-            return socket.listeners['leaveGame']({gameId: 'validGameId'})
-            .finally(function(){
-                room.emit.should.have.been.calledWith('userLeft');
-                room.emit.firstCall.args[1].should.eql({userId: socket.id});
-            });
+            socket.rooms = ['validGameId'];
+            socket.listeners['disconnect']();
+            room.emit.should.have.been.calledWith('userLeft');
+            room.emit.firstCall.args[1].should.eql(socket.id);
+        });
+
+        it('should notify game repository when user leaves', function () {
+            socket.rooms = ['validGameId'];
+            socket.listeners['disconnect']();
+            app.gameRepository.removeUserFromGame.should.have.been.calledWith('validGameId', socket.id);
         });
     });
 });

@@ -10,14 +10,16 @@ describe 'Controller: PlayCtrl', () ->
   scope = {}
   $httpBackend = {}
   $timeout = {}
+  $location = {}
   routeParams = {}
   socket = {}
   window = {}
 
   # Initialize the controller and a mock scope
-  beforeEach inject (_$httpBackend_, $controller, $rootScope, _$timeout_) ->
+  beforeEach inject (_$httpBackend_, $controller, $rootScope, _$timeout_, _$location_) ->
     $httpBackend = _$httpBackend_
     $timeout = _$timeout_
+    $location = _$location_
 
     socket = _mocks.socket()
     socket.id = 'validSocketId'
@@ -61,6 +63,11 @@ describe 'Controller: PlayCtrl', () ->
       jasmine.any Function
     )
 
+  it 'should handle failed game join message', ->
+    socket.emit.and.callFake (event, data, cb) -> cb(new Error())
+    connect()
+    expect($location.url()).toBe '/'
+
   describe 'after joining', ->
     players = []
     gameData = {}
@@ -89,11 +96,6 @@ describe 'Controller: PlayCtrl', () ->
     it 'should remove a player when receiving the userLeft message', ->
       invokeEvent('userLeft', 'validUserId1')
       expect(scope.game.players).not.toEqual jasmine.objectContaining({'validUserId1': jasmine.any(Object)})
-
-    it 'should handle failed game join message', ->
-      expect(true).toBe(true)
-
-    it 'should emit leave message when navigating away from game', ->
 
 
 
