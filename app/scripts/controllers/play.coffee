@@ -1,7 +1,7 @@
 'use strict'
 
 angular.module('mathGameApp')
-  .controller 'PlayCtrl', ($scope, $window, $q, $location, $routeParams) ->
+  .controller 'PlayCtrl', ($scope, $window, $timeout, $q, $location, $routeParams) ->
     socket = null
     gameId = $routeParams['gameId']
 
@@ -14,14 +14,25 @@ angular.module('mathGameApp')
 
     class PlayController
       constructor: ->
-        @userName= 'User'
+        @players = {}
+        @userName= "User"
         openSocket()
         .then =>
-          socket.emit('joinGame', {gameId, userName: @userName})
-          socket.join(gameId)
+          socket.emit('joinGame', {gameId, userName: @userName}, @_onJoinSucceeded)
+          socket.on('userJoined', @_onUserJoined)
+          socket.on('userLeft', @_onUserLeft)
+
+      _onUserJoined: (data) =>
+        $timeout(=> @players[data.id] = data.userInfo)
+
+      _onUserLeft: (userId) =>
+        $timeout =>
+          delete @players[userId]
+
+      _onJoinSucceeded: (gameData)=>
+        $timeout( => @players = gameData.players )
 
 
-
-    return new PlayController()
-
-
+    ctrl = new PlayController()
+    $scope.game = ctrl
+    return ctrl

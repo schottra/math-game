@@ -54,14 +54,17 @@ describe('Game Socket', function () {
             app.gameRepository.addUserToGame.firstCall.args[0].should.eql({
                 gameId: 'validGameId',
                 userId: 'validSocketId',
-                userName: 'user1'
+                userInfo: {name: 'user1'}
             });
         });
 
-        it('should emit a success message to socket when user join succeeds', function(){
-            return socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'})
+        it('should respond with game data when a user joins', function () {
+            var callback = sinon.spy();
+            var gameData = {id: 'validId'};
+            app.gameRepository.getGame = sinon.stub().returns( q(gameData) );
+            return socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'}, callback)
             .finally(function(){
-                socket.emit.should.have.been.calledWith('joinGame success');
+                callback.should.have.been.calledWith(gameData);
             });
         });
 
@@ -77,7 +80,7 @@ describe('Game Socket', function () {
             return socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'})
             .finally(function(){
                 room.emit.should.have.been.calledWith('userJoined');
-                room.emit.firstCall.args[1].should.eql({userId: socket.id, userName: 'user1'});
+                room.emit.firstCall.args[1].should.eql({id: socket.id, userInfo: {name: 'user1'}});
             });
         });
 

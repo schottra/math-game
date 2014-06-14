@@ -19,7 +19,7 @@ describe('Game Repository', function(){
     });
 
     it('should reject if adding user to game that does not exist', function(){
-        return repo.addUserToGame({gameId: 'invalid', userName: 'user1'}).should.be.rejected;
+        return repo.addUserToGame({gameId: 'invalid', userId: 'validId1', userInfo:{}}).should.be.rejected;
     });
 
     describe('with game', function(){
@@ -32,7 +32,7 @@ describe('Game Repository', function(){
         });
 
         it('should resolve if adding user to game that exists', function(){
-            return repo.addUserToGame({gameId: game.id, userName: 'user1'});
+            return repo.addUserToGame({gameId: game.id, userId: 'validId1', userInfo: {}});
         });
 
         it('should allow retrieving a game record by id', function(){
@@ -47,7 +47,7 @@ describe('Game Repository', function(){
         });
 
         it('should correctly add new users to game record', function () {
-            return repo.addUserToGame({gameId: game.id, userId: 'validId1', userName: 'user1'})
+            return repo.addUserToGame({gameId: game.id, userId: 'validId1', userInfo: {name:'user1'}})
             .then(function(){
                 repo.getGame(game.id).then(function(retrieved){
                     retrieved.players.should.containEql({'validId1': {name: 'user1'}});
@@ -56,9 +56,9 @@ describe('Game Repository', function(){
         });
 
         it('should not allow a user with the same id to be added twice', function () {
-            return repo.addUserToGame({gameId: game.id, userId: 'validId1', userName: 'user1'})
+            return repo.addUserToGame({gameId: game.id, userId: 'validId1', userInfo: {name:'user1'}})
             .then(function(){
-                return repo.addUserToGame({gameId: game.id, userId: 'validId1', userName: 'user2'}).should.be.rejected;
+                return repo.addUserToGame({gameId: game.id, userId: 'validId1', userInfo: {name: 'user2'}}).should.be.rejected;
             })
         });
 

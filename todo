@@ -30,3 +30,8 @@
 - When a new client connects, they need to be able to retrieve the current game status
 - Store game history, so users can browse previous game results
 
+*Error Handling*
+- Can't create game
+- Game doesn't exist (redirect back to index)
+- Can't connect to game socket
+- Lose connection to game socket
