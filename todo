@@ -1,5 +1,3 @@
-- Persist game id when creating game (db?)
-
 *Gameplay*
 - Ask user to input a name when they join a game
   - Allow duplicate names (append a number)

@@ -1,9 +1,22 @@
 <div class="container">
-    <div class="col-md-8" id="game-area"></div>
-    <div class="col-md-4" id="player-list">
+    <div class="col-sm-8 col-md-8" id="game-area">
+        <h3>The Game</h3>
+        <h5>The question is: </h5>
+        <div class="question-text" ng-bind="game.currentQuestion"></div>
+        <form>
+            <div class="form-group">
+                <label for="question-answer">Answer</label>
+                <input placeholder="Enter your answer" id="question-answer" type="text" class="form-control input-lg">
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-sm-4 col-md-4" id="player-list">
         <h4>Players</h4>
         <ul class="list-unstyled">
-            <li ng-repeat="player in game.players | filter:{active:true}">{{player.name}} ({{player.id}})</li>
+            <li ng-repeat="player in game.players | filter:{active:true}">({{player.id}})</li>
         </ul>
     </div>
 </div>
