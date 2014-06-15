@@ -3,6 +3,7 @@
 angular.module('mathGameApp')
   .controller 'PlayCtrl', ($scope, $window, $timeout, $q, $location, $routeParams) ->
     socket = null
+    userId = null
     gameId = $routeParams['gameId']
 
     openSocket = ->
@@ -10,6 +11,7 @@ angular.module('mathGameApp')
       socket = $window.io('/game')
       socket.on('connect', -> d.resolve())
       socket.on('connect_error', (error)-> d.reject(error))
+      socket.on('userId assigned', (id)->userId = id)
       return d.promise
 
     class PlayController
@@ -23,7 +25,10 @@ angular.module('mathGameApp')
           socket.on('userLeft', @_onUserLeft)
 
       _onUserJoined: (userInfo) =>
-        $timeout(=> @players.push userInfo)
+        $timeout =>
+          for player in @players
+            if player.id is userInfo.id then return
+          @players.push(userInfo) if userInfo.id isnt userId
 
       _onUserLeft: (userId) =>
         $timeout =>

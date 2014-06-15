@@ -44,6 +44,11 @@ describe('Game Socket', function () {
         socket.on.should.have.been.calledWith('disconnect');
     });
 
+    it('should assign connecting sockets a user id', function(){
+        connectSocket();
+        socket.emit.should.have.been.calledWith('userId assigned', sinon.match.string);
+    });
+
     describe('with connected socket', function () {
         beforeEach(connectSocket);
         beforeEach(function () {
