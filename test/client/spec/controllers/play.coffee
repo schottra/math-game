@@ -73,9 +73,11 @@ describe 'Controller: PlayCtrl', () ->
     gameData = {}
 
     beforeEach ->
-      players =
-        'validUserId1': { userName: 'validUserName1'}
-        'validUserId2': { userName: 'validUserName2'}
+      players = [
+        {id: 'validUserId1', name: 'validUserName1'}
+        {id: 'validUserId2', name: 'validUserName2'}
+      ]
+
       gameData =
         players: players
 
@@ -90,12 +92,12 @@ describe 'Controller: PlayCtrl', () ->
       expect(scope.game.players).toEqual players
 
     it 'should add a player when receiving the userJoined message', ->
-      invokeEvent('userJoined', {id: 'validUserId3', userInfo: {name: 'validUserName3'}})
-      expect(scope.game.players).toEqual jasmine.objectContaining({'validUserId3': jasmine.any(Object)})
+      invokeEvent 'userJoined', {id: 'validUserId3', name: 'validUserName3'}
+      expect(scope.game.players).toContain jasmine.objectContaining({id:'validUserId3'})
 
     it 'should remove a player when receiving the userLeft message', ->
-      invokeEvent('userLeft', 'validUserId1')
-      expect(scope.game.players).not.toEqual jasmine.objectContaining({'validUserId1': jasmine.any(Object)})
+      invokeEvent 'userLeft', 'validUserId1'
+      expect(scope.game.players).not.toContain jasmine.objectContaining({id: 'validUserId1'})
 
 
 

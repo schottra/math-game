@@ -50,47 +50,56 @@ describe('Game Socket', function () {
             gameNamespace.in.withArgs('validGameId').returns(room);
         });
 
+        var gameId = 'validGameId';
+        var userName = 'user1';
+        var userInfo = {name: userName, id: socket.id};
+        var joinCallback = sinon.stub();
+
+        var joinGame = function(){
+            return socket.listeners['joinGame']({gameId: gameId, userName: userName}, joinCallback);
+        };
+
         it('should pass required values when adding a user to a game', function(){
-            socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'});
-            app.gameRepository.addUserToGame.firstCall.args[0].should.eql({
-                gameId: 'validGameId',
-                userId: 'validSocketId',
-                userInfo: {name: 'user1'}
+            return joinGame().
+            finally(function(){
+                app.gameRepository.addUserToGame.should.have.been.calledWith(gameId, {name: userName, id: socket.id});
             });
         });
 
         it('should respond with game data when a user joins', function () {
-            var callback = sinon.spy();
             var gameData = {id: 'validId'};
-            app.gameRepository.getGame = sinon.stub().returns( q(gameData) );
-            return socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'}, callback)
+            app.gameRepository.addUserToGame = sinon.stub().returns( q(gameData) );
+            return joinGame()
             .finally(function(){
-                callback.should.have.been.calledWith(gameData);
+                joinCallback.should.have.been.calledWith(gameData);
             });
         });
 
         it('should emit a failure message to socket when user join fails', function () {
             app.gameRepository.addUserToGame.returns(q.reject());
-            var callback = sinon.stub();
-            return socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'}, callback)
+            return joinGame()
             .finally(function(){
-                callback.should.have.been.calledWith(sinon.match.instanceOf(Error));
+                joinCallback.should.have.been.calledWith(sinon.match.instanceOf(Error));
             });
         });
 
         it('should emit a message to game room when a user joins', function(){
-            return socket.listeners['joinGame']({gameId: 'validGameId', userName: 'user1'})
+            return joinGame()
             .finally(function(){
-                room.emit.should.have.been.calledWith('userJoined');
-                room.emit.firstCall.args[1].should.eql({id: socket.id, userInfo: {name: 'user1'}});
+                room.emit.should.have.been.calledWithMatch(
+                    'userJoined',
+                    {id: socket.id, name: 'user1'}
+                );
             });
         });
 
         it('should emit a message to game room when a user leaves', function () {
             socket.rooms = ['validGameId'];
             socket.listeners['disconnect']();
-            room.emit.should.have.been.calledWith('userLeft');
-            room.emit.firstCall.args[1].should.eql(socket.id);
+            room.emit.should.have.been.calledWith(
+                'userLeft',
+                socket.id
+            );
         });
 
         it('should notify game repository when user leaves', function () {

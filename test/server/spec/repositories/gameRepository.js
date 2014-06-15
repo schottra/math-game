@@ -3,6 +3,7 @@
 var should = require('chai').should(),
     sinon = require('sinon'),
     q = require('q'),
+    _ = require('lodash'),
     gameRepository = _setup.requireRepository('gameRepository');
 
 describe('Game Repository', function(){
@@ -23,24 +24,29 @@ describe('Game Repository', function(){
     });
 
     describe('with game', function(){
-        var game = {};
+        var gameId = null;
         beforeEach(function () {
-            return repo.createGame().then(function(createdGame){game = createdGame;});
-        });
-        afterEach(function(){
-           game = {}
+            return repo.createGame().then(function(createdGame){gameId = createdGame.id;});
         });
 
+        var getGame = function() {
+            return repo.getGame(gameId);
+        };
+
+        var getUser = function(game){
+            return _.find(game.players, {id: userId});
+        };
+
         var userId = 'validId1';
-        var userInfo = {name: 'user1'};
+        var userInfo = {id: userId, name: 'user1'};
         var addUser = function(){
-            return repo.addUserToGame({gameId: game.id, userId: userId, userInfo: userInfo});
+            return repo.addUserToGame(gameId, userInfo);
         };
 
         it('should allow retrieving a game record by id', function(){
-            return repo.getGame(game.id)
+            return getGame()
             .then(function(returnedGame){
-                returnedGame.should.eql(game);
+                returnedGame.should.not.be.undefined;
             });
         });
 
@@ -54,10 +60,10 @@ describe('Game Repository', function(){
 
         it('should correctly add new users to game record', function () {
             return addUser()
-            .then(function(){
-                repo.getGame(game.id).then(function(retrieved){
-                    retrieved.players.should.containEql({'validId1': {name: 'user1'}});
-                });
+            .then(getGame)
+            .then(getUser)
+            .then(function(user){
+                user.should.exist;
             });
         });
 
@@ -70,17 +76,21 @@ describe('Game Repository', function(){
 
         it('should set player state to active when they join a game', function() {
             return addUser()
-            .then(function() {
-                game.players[userId].active.should.be.true;
+            .then(getGame)
+            .then(getUser)
+            .then(function(user){
+                user.active.should.be.true;
             });
         });
 
         it('should set player state to inactive when they leave a game', function () {
             return addUser()
             .then(function(){
-                repo.removeUserFromGame(game.id, userId)
-                .then( function(){
-                    game.players[userId].active.should.be.false;
+                repo.removeUserFromGame(gameId, userId)
+                .then(getGame)
+                .then(getUser)
+                .then(function(user){
+                    user.active.should.be.false;
                 });
             })
         });
