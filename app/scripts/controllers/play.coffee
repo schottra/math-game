@@ -15,6 +15,7 @@ angular.module('mathGameApp')
     class PlayController
       constructor: ->
         @players = {}
+        @activePlayers = []
         @userName= "User"
         openSocket()
         .then =>
