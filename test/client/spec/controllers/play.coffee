@@ -89,19 +89,19 @@ describe 'Controller: PlayCtrl', () ->
       expect(socket.on).toHaveBeenCalledWith 'userLeft', jasmine.any(Function)
 
     it 'should populate the scope with received game data after joining a game', ->
-      expect(scope.game.players).toEqual players
+      expect(scope.game.info.players).toEqual players
 
     it 'should add a player when receiving the userJoined message', ->
       invokeEvent 'userJoined', {id: 'validUserId3', name: 'validUserName3'}
-      expect(scope.game.players).toContain jasmine.objectContaining({id:'validUserId3'})
+      expect(scope.game.info.players).toContain jasmine.objectContaining({id:'validUserId3'})
 
     it 'should not add duplicate player entries', ->
       invokeEvent 'userJoined', players[0]
-      expect(scope.game.players.length).toBe 2
+      expect(scope.game.info.players.length).toBe 2
 
     it 'should remove a player when receiving the userLeft message', ->
       invokeEvent 'userLeft', 'validUserId1'
-      expect(scope.game.players).not.toContain jasmine.objectContaining({id: 'validUserId1'})
+      expect(scope.game.info.players).not.toContain jasmine.objectContaining({id: 'validUserId1'})
 
 
 

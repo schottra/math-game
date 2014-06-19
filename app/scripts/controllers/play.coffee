@@ -16,7 +16,7 @@ angular.module('mathGameApp')
 
     class PlayController
       constructor: ->
-        @players = []
+        @info = {}
         @userName= "User"
         openSocket()
         .then =>
@@ -24,21 +24,24 @@ angular.module('mathGameApp')
           socket.on('userJoined', @_onUserJoined)
           socket.on('userLeft', @_onUserLeft)
 
+      _parseGame: (data) =>
+        @info = data
+
       _onUserJoined: (userInfo) =>
         $timeout =>
-          for player in @players
+          for player in @info.players
             if player.id is userInfo.id then return
-          @players.push(userInfo) if userInfo.id isnt userId
+          @info.players.push(userInfo) if userInfo.id isnt userId
 
       _onUserLeft: (userId) =>
         $timeout =>
-          for player, i in @players
-            if player.id is userId then return @players.splice(i,1)
+          for player, i in @info.players
+            if player.id is userId then return @info.players.splice(i,1)
 
       _onJoinResponse: (response)=>
         if response instanceof Error then return $location.url('/')
 
-        $timeout( => @players = response.players )
+        $timeout( => @_parseGame(response) )
 
 
     ctrl = new PlayController()

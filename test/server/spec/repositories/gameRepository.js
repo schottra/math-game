@@ -19,6 +19,10 @@ describe('Game Repository', function(){
         });
     });
 
+    it('should generate a unique id when creating a game', function() {
+        //todo
+    });
+
     it('should reject if adding user to game that does not exist', function(){
         return repo.addUserToGame({gameId: 'invalid', userId: 'validId1', userInfo:{}}).should.be.rejected;
     });
