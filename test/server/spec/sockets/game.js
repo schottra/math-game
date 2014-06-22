@@ -11,6 +11,7 @@ describe('Game Socket', function () {
     var app = {},
         io = {},
         gameNamespace = {},
+        gameRepo = {},
         room = {},
         socket = {} ;
 
@@ -18,6 +19,8 @@ describe('Game Socket', function () {
         app = {
             gameRepository: gameRepoMock()
         };
+        gameRepo = app.gameRepository;
+
         io = ioMock();
         gameNamespace = ioMock();
         room = ioMock();
@@ -61,7 +64,7 @@ describe('Game Socket', function () {
             gameData = {
                 clientVisibleData: {id: 'validId'}
             };
-            app.gameRepository.addUserToGame = sinon.stub().returns( q(gameData) );
+            gameRepo.addUserToGame = sinon.stub().returns( q(gameData) );
             gameId = 'validGameId';
             userName = 'user1';
             userInfo = {name: userName, id: socket.id};
@@ -76,7 +79,7 @@ describe('Game Socket', function () {
         it('should pass required values when adding a user to a game', function(){
             return joinGame().
             finally(function(){
-                app.gameRepository.addUserToGame.should.have.been.calledWith(gameId, {name: userName, id: socket.id});
+                gameRepo.addUserToGame.should.have.been.calledWith(gameId, {name: userName, id: socket.id});
             });
         });
 
@@ -88,7 +91,7 @@ describe('Game Socket', function () {
         });
 
         it('should emit a failure message to socket when user join fails', function () {
-            app.gameRepository.addUserToGame.returns(q.reject());
+            gameRepo.addUserToGame.returns(q.reject());
             return joinGame()
             .finally(function(){
                 joinCallback.should.have.been.calledWith(sinon.match.instanceOf(Error));
@@ -117,7 +120,52 @@ describe('Game Socket', function () {
         it('should notify game repository when user leaves', function () {
             socket.rooms = ['validGameId'];
             socket.listeners['disconnect']();
-            app.gameRepository.removeUserFromGame.should.have.been.calledWith('validGameId', socket.id);
+            gameRepo.removeUserFromGame.should.have.been.calledWith('validGameId', socket.id);
+        });
+
+        describe('when processing answers', function () {
+            var answerData = {};
+            beforeEach(function(done){
+                answerData = {
+                    gameId: gameId,
+                    answer: 'theAnswer'
+                };
+                joinGame().done(done);
+            });
+            var sendAnswer = function () {
+                return socket.listeners['answerQuestion'](answerData);
+            };
+
+            it('should emit wrong answer event when answer is resolved as incorrect', function () {
+                gameRepo.answerCurrentQuestion.returns( q({correct: false}) );
+                return sendAnswer()
+                .finally( function(){
+                    socket.emit.should.have.been.calledWith(
+                        'answerIncorrect'
+                    );
+                });
+            });
+
+            it('should emit questionEnded event when answer is resolved as correct', function() {
+                gameRepo.answerCurrentQuestion.returns( q({correct: true}) );
+                return sendAnswer()
+                .finally( function(){
+                    room.emit.should.have.been.calledWith(
+                        'questionEnded',
+                        sinon.match({winner: socket.id})
+                    );
+                });
+            });
+
+            it('should not emit any events for rejected answers', function(){
+                gameRepo.answerCurrentQuestion.returns( q.reject() );
+                return sendAnswer()
+                .finally( function(){
+                    room.emit.should.not.have.been.calledWithMatch('questionEnded');
+                    socket.emit.should.not.have.been.calledWithMatch('answerIncorrect');
+                });
+            })
+
         });
     });
 });

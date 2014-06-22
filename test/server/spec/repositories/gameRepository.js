@@ -132,6 +132,56 @@ describe('Game Repository', function(){
             })
         });
 
+        it('should resolve with correct:false when a question is answered incorrectly', function () {
+            return repo.answerCurrentQuestion(gameId, 'incorrectAnswer')
+            .then(function (result) {
+                result.correct.should.be.false
+            });
+        });
+
+        var answerCorrectly = function(){
+            return getGame().then(function(game){
+                return repo.answerCurrentQuestion(gameId, game.currentQuestion.answer)
+            });
+        };
+
+        it('should resolve with correct:true when a question is answered correctly', function(){
+            return answerCorrectly()
+            .then(function(result){
+                result.correct.should.be.true;
+            });
+        });
+
+        it('should add the current question to the questions list when it has been answered', function(){
+            return answerCorrectly()
+            .then( getGame )
+            .then( function(game){
+                game.questions[game.questions.length-1].should.deep.equal(game.currentQuestion);
+            })
+        });
+
+        it('should should mark the current question as answered when processing a correct answer', function(){
+            return answerCorrectly()
+            .then( getGame )
+            .then( function(game){
+                game.currentQuestion.hasBeenAnswered.should.be.true;
+            })
+        });
+
+        it('should reject incorrect answers if the question has already been answered', function () {
+            return answerCorrectly()
+            .then( function(){
+                return repo.answerCurrentQuestion(gameId, 'someAnswer').should.be.rejected;
+            })
+        });
+
+        it('should reject correct answers if the question has already been answered', function () {
+            return answerCorrectly()
+            .then( function(){
+                return answerCorrectly().should.be.rejected;
+            })
+        });
+
     });
 
 });
