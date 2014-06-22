@@ -2,6 +2,7 @@
 
 angular.module('mathGameApp')
   .controller 'PlayCtrl', ($scope, $window, $timeout, $q, $location, $routeParams) ->
+    #TODO: Move socket stuff into a service and wrap up the $timeout event stuff
     socket = null
     userId = null
     gameId = $routeParams['gameId']
@@ -26,10 +27,16 @@ angular.module('mathGameApp')
           socket.on('userJoined', @_onUserJoined)
           socket.on('userLeft', @_onUserLeft)
           socket.on('answerGraded', @_onAnswerGraded)
+          socket.on('questionEnded', @_onQuestionEnded)
 
       _parseGame: (data) =>
         @info = data
 
+      _clearAnswerState: =>
+        @processingAnswer = false
+        @currentAnswer = ''
+
+    #### Socket events (using $timeout to ensure a $digest loop)
       _onUserJoined: (userInfo) =>
         $timeout =>
           for player in @info.players
@@ -47,16 +54,22 @@ angular.module('mathGameApp')
         $timeout( => @_parseGame(response) )
 
       _onAnswerGraded: (result) =>
-        @processingAnswer = false
-        @currentAnswer = ''
+        $timeout =>
+          @_clearAnswerState()
 
-      submitAnswer: (answer) =>
+      _onQuestionEnded: (result) =>
+        $timeout =>
+          @_clearAnswerState()
+
+
+    #### Public functions
+      submitAnswer: =>
         if @processingAnswer then return
 
         @processingAnswer = true
         answerData =
           gameId: gameId
-          answer: answer
+          answer: @currentAnswer
         socket.emit('answerQuestion', answerData )
 
 
