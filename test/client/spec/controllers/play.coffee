@@ -4,7 +4,7 @@ _mocks = window._mocks
 describe 'Controller: PlayCtrl', () ->
 
   # load the controller's module
-  beforeEach module 'mathGameSpecs'
+  beforeEach module 'mathgame.specs'
 
   PlayCtrl = {}
   scope = {}

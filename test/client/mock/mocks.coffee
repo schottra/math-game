@@ -1,1 +1,1 @@
-angular.module('mathGameMocks', [])
+angular.module('mathgame.mocks', [])

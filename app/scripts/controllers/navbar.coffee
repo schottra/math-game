@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('mathGameApp')
+angular.module('mathgame.app')
   .controller 'NavbarCtrl', ($scope, $location) ->
     $scope.menu = [
       title: 'Home'

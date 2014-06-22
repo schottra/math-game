@@ -1,4 +1,4 @@
-angular.module('mathGameMocks').factory('socketMock', ($q)->
+angular.module('mathgame.mocks').factory('socketMock', ($q)->
   return ->
     mock =
       connectionPromise: $q.defer()

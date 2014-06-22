@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('mathGameApp')
+angular.module('mathgame.app')
   .controller 'MainCtrl', ($scope, $location, $http) ->
     class MainController
       newGame: ->

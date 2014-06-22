@@ -3,7 +3,7 @@
 describe 'Controller: MainCtrl', () ->
 
   # load the controller's module
-  beforeEach module 'mathGameSpecs'
+  beforeEach module 'mathgame.specs'
 
   MainCtrl = {}
   scope = {}

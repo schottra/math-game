@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('mathGameApp')
+angular.module('mathgame.app')
   .controller 'PlayCtrl', ($scope, $window, $q, $location, $routeParams, SocketAdapter) ->
     socket = new SocketAdapter('/game')
     gameId = $routeParams['gameId']
@@ -12,9 +12,9 @@ angular.module('mathGameApp')
         @processingAnswer = false
         @currentAnswer = ''
         @userId = ''
+        socket.on 'userId assigned', (id)=> @userId = id
         socket.waitForConnection()
         .then =>
-          @userId = socket.id
           socket.emit('joinGame', {gameId, userName: @userName}, @_onJoinResponse)
           socket.on('userJoined', @_onUserJoined)
           socket.on('userLeft', @_onUserLeft)

@@ -4,13 +4,16 @@
         <h5>The question is: </h5>
         <div class="question-text" ng-bind="game.info.currentQuestion"></div>
         <form>
-            <div class="form-group">
-                <label for="question-answer">Answer</label>
-                <input placeholder="Enter your answer" ng-model="game.currentAnswer" id="question-answer" type="text" class="form-control input-lg">
-            </div>
-            <div class="text-center" ng-disable="game.processingAnswer">
-                <button type="submit" class="btn btn-primary btn-lg" ng-click="game.submitAnswer()">Submit</button>
-            </div>
+            <fieldset ng-disabled="game.processingAnswer">
+                <div class="form-group">
+                    <label for="question-answer">Answer</label>
+                    <input placeholder="Enter your answer" ng-model="game.currentAnswer" id="question-answer" type="text" class="form-control input-lg">
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg" ng-click="game.submitAnswer()">Submit</button>
+                </div>
+            </fieldset>
+
         </form>
     </div>
     <div class="col-sm-4 col-md-4" id="player-list">
