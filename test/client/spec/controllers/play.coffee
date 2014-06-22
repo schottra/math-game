@@ -4,28 +4,26 @@ _mocks = window._mocks
 describe 'Controller: PlayCtrl', () ->
 
   # load the controller's module
-  beforeEach module 'mathGameApp'
+  beforeEach module 'mathGameSpecs'
 
   PlayCtrl = {}
   scope = {}
   $httpBackend = {}
-  $timeout = {}
   $location = {}
   routeParams = {}
   socket = {}
   window = {}
+  socketAdapterMock = {}
 
   # Initialize the controller and a mock scope
-  beforeEach inject (_$httpBackend_, $controller, $rootScope, _$timeout_, _$location_) ->
+  beforeEach inject (_$httpBackend_, $controller, $rootScope, _$location_, socketMock) ->
     $httpBackend = _$httpBackend_
-    $timeout = _$timeout_
     $location = _$location_
 
-    socket = _mocks.socket()
+    socket = socketMock()
+    socketAdapterMock = jasmine.createSpy('SocketAdapter').and.returnValue(socket)
     socket.id = 'validSocketId'
 
-    window.io = -> socket
-    spyOn(window, 'io').and.callThrough()
     spyOn(socket, 'on').and.callThrough()
     spyOn(socket, 'emit').and.callThrough()
 
@@ -34,19 +32,16 @@ describe 'Controller: PlayCtrl', () ->
     scope = $rootScope.$new()
     PlayCtrl = $controller 'PlayCtrl', {
       $scope: scope
+      SocketAdapter: socketAdapterMock
       $routeParams: routeParams
       $window: window
     }
 
-  afterEach ->
-    window.io = null
-
   invokeEvent = (name, data) ->
     socket.listeners[name][0](data)
-    $timeout.flush()
 
   connect = ->
-    invokeEvent('connect')
+    socket.connectionPromise.resolve()
     scope.$digest()
 
 
@@ -54,7 +49,7 @@ describe 'Controller: PlayCtrl', () ->
     expect(scope.game).toBe PlayCtrl
 
   it 'should connect to the game socket', ->
-    expect(window.io).toHaveBeenCalledWith '/game'
+    expect(socketAdapterMock).toHaveBeenCalledWith '/game'
 
   it 'should emit a join message for the game after connecting', ->
     connect()

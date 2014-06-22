@@ -1,19 +1,9 @@
 'use strict'
 
 angular.module('mathGameApp')
-  .controller 'PlayCtrl', ($scope, $window, $timeout, $q, $location, $routeParams) ->
-    #TODO: Move socket stuff into a service and wrap up the $timeout event stuff
-    socket = null
-    userId = null
+  .controller 'PlayCtrl', ($scope, $window, $q, $location, $routeParams, SocketAdapter) ->
+    socket = new SocketAdapter('/game')
     gameId = $routeParams['gameId']
-
-    openSocket = ->
-      d = $q.defer()
-      socket = $window.io('/game')
-      socket.on('connect', -> d.resolve())
-      socket.on('connect_error', (error)-> d.reject(error))
-      socket.on('userId assigned', (id)->userId = id)
-      return d.promise
 
     class PlayController
       constructor: ->
@@ -21,8 +11,10 @@ angular.module('mathGameApp')
         @userName= "User"
         @processingAnswer = false
         @currentAnswer = ''
-        openSocket()
+        @userId = ''
+        socket.waitForConnection()
         .then =>
+          @userId = socket.id
           socket.emit('joinGame', {gameId, userName: @userName}, @_onJoinResponse)
           socket.on('userJoined', @_onUserJoined)
           socket.on('userLeft', @_onUserLeft)
@@ -36,30 +28,26 @@ angular.module('mathGameApp')
         @processingAnswer = false
         @currentAnswer = ''
 
-    #### Socket events (using $timeout to ensure a $digest loop)
+    #### Socket events
       _onUserJoined: (userInfo) =>
-        $timeout =>
-          for player in @info.players
-            if player.id is userInfo.id then return
-          @info.players.push(userInfo) if userInfo.id isnt userId
+        for player in @info.players
+          if player.id is userInfo.id then return
+        @info.players.push(userInfo) if userInfo.id isnt @userId
 
       _onUserLeft: (userId) =>
-        $timeout =>
-          for player, i in @info.players
-            if player.id is userId then return @info.players.splice(i,1)
+        for player, i in @info.players
+          if player.id is userId then return @info.players.splice(i,1)
 
       _onJoinResponse: (response)=>
         if response instanceof Error then return $location.url('/')
 
-        $timeout( => @_parseGame(response) )
+        @_parseGame(response)
 
       _onAnswerGraded: (result) =>
-        $timeout =>
-          @_clearAnswerState()
+        @_clearAnswerState()
 
       _onQuestionEnded: (result) =>
-        $timeout =>
-          @_clearAnswerState()
+        @_clearAnswerState()
 
 
     #### Public functions

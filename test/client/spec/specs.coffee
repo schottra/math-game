@@ -1,0 +1,1 @@
+angular.module('mathGameSpecs', ['mathGameApp', 'mathGameMocks'])

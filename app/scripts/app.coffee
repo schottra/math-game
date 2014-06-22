@@ -1,10 +1,13 @@
 'use strict'
 
+angular.module('mathGameServices',[])
+
 angular.module('mathGameApp', [
 #  'ngCookies',
 #  'ngResource',
 #  'ngSanitize',
-  'ngRoute'
+  'ngRoute',
+  'mathGameServices'
 ])
   .config ($routeProvider, $locationProvider) ->
     $routeProvider
