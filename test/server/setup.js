@@ -15,8 +15,8 @@ global._setup = {
         return require(path.join(baseDir, 'server'));
     },
 
-    requireRepository: function(repositoryName){
-        return require(path.join(libDir, 'repositories', repositoryName ));
+    getRepositoryPath: function(repositoryName){
+        return path.join(__dirname,libDir, 'repositories', repositoryName);
     },
 
     requireSocket: function(socketName){

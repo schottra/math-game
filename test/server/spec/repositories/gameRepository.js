@@ -1,26 +1,59 @@
 "use strict";
 
-var should = require('chai').should(),
+var proxyquire = require('proxyquire'),
+    should = require('chai').should(),
     sinon = require('sinon'),
     q = require('q'),
     _ = require('lodash'),
-    gameRepository = _setup.requireRepository('gameRepository');
+    gameRepository = require(_setup.getRepositoryPath('gameRepository'));
 
 describe('Game Repository', function(){
-    var repo = {};
+    var repo;
 
     beforeEach(function(){
         repo = gameRepository();
     });
+    afterEach(function(){
+    });
+
+    var getRepoWithStubbedRandomstring = function(stub){
+        return proxyquire(
+            _setup.getRepositoryPath('gameRepository'),
+            {
+                'randomstring': stub
+            }
+        )();
+    };
 
     it('should generate an id when creating a game', function () {
-        repo.createGame().then( function(game){
-            game.should.have.property('id').type('string');
+        return repo.createGame().then( function(game){
+            game.should.have.property('id').that.is.a('string');
         });
     });
 
     it('should generate a unique id when creating a game', function() {
-        //todo
+        var randomstringStub = {};
+        // Simulate the off chance that we get the same generated id for two different games
+        var firstString = 'abcdef';
+        var secondString = '123456';
+        randomstringStub.generate = sinon.stub();
+        randomstringStub.generate.onFirstCall().returns(firstString);
+        randomstringStub.generate.onSecondCall().returns(firstString);
+        randomstringStub.generate.onThirdCall().returns(secondString);
+
+        repo = getRepoWithStubbedRandomstring(randomstringStub);
+
+        return repo.createGame().then( function(firstGame){
+            return repo.createGame()
+            .then( function(){
+                console.log(repo.games);
+                return repo.getGame(firstString)
+                .then(function(retrievedGame){
+                    randomstringStub.generate.should.have.been.calledThrice;
+                    retrievedGame.should.equal(firstGame);
+                });
+            });
+        });
     });
 
     it('should reject if adding user to game that does not exist', function(){

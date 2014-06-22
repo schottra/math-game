@@ -50,15 +50,24 @@ describe('Game Socket', function () {
     });
 
     describe('with connected socket', function () {
+        var gameData,
+            gameId,
+            userName,
+            userInfo,
+            joinCallback;
+
         beforeEach(connectSocket);
         beforeEach(function () {
-            gameNamespace.in.withArgs('validGameId').returns(room);
+            gameData = {
+                clientVisibleData: {id: 'validId'}
+            };
+            app.gameRepository.addUserToGame = sinon.stub().returns( q(gameData) );
+            gameId = 'validGameId';
+            userName = 'user1';
+            userInfo = {name: userName, id: socket.id};
+            joinCallback = sinon.stub();
+            gameNamespace.in.withArgs(gameId).returns(room);
         });
-
-        var gameId = 'validGameId';
-        var userName = 'user1';
-        var userInfo = {name: userName, id: socket.id};
-        var joinCallback = sinon.stub();
 
         var joinGame = function(){
             return socket.listeners['joinGame']({gameId: gameId, userName: userName}, joinCallback);
@@ -72,11 +81,9 @@ describe('Game Socket', function () {
         });
 
         it('should respond with game data when a user joins', function () {
-            var gameData = {id: 'validId'};
-            app.gameRepository.addUserToGame = sinon.stub().returns( q(gameData) );
             return joinGame()
             .finally(function(){
-                joinCallback.should.have.been.calledWith(gameData);
+                joinCallback.should.have.been.calledWith(gameData.clientVisibleData);
             });
         });
 

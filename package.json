@@ -64,6 +64,7 @@
     "karma-script-launcher": "~0.1.0",
     "load-grunt-tasks": "~0.4.0",
     "open": "~0.0.5",
+    "proxyquire": "^1.0.1",
     "requirejs": "~2.1.13",
     "should": "~4.0.0",
     "sinon": "^1.10.2",

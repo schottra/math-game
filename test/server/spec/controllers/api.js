@@ -8,9 +8,15 @@ var should = require('chai').should(),
 
 describe('POST /api/game', function() {
     var sandbox;
+    var returnedGame = {};
 
     beforeEach(function(){
         sandbox = sinon.sandbox.create();
+        returnedGame = {
+            clientVisibleData: {
+                id: 'validGameId'
+            }
+        };
     });
 
     afterEach(function(){
@@ -31,13 +37,25 @@ describe('POST /api/game', function() {
 
     it('should return an object containing an id as a string', function(done) {
         var stub = sandbox.stub(app.gameRepository, 'createGame');
-        stub.returns(q({id: 'validId'}));
+        stub.returns(q(returnedGame));
         request(app)
             .post('/api/game')
             .end(function(err,res) {
-               res.body.should.have.property('id').eql('validId');
+               res.body.should.have.property('id').eql('validGameId');
                 done();
             });
+
+    });
+
+    it('should only expose client-visible properties when returning the created game', function(done) {
+        var stub = sandbox.stub(app.gameRepository, 'createGame');
+        stub.returns(q(returnedGame));
+        request(app)
+        .post('/api/game')
+        .end(function(err,res) {
+            res.body.should.deep.equal(returnedGame.clientVisibleData);
+            done();
+        });
 
     });
 
