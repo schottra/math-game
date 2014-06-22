@@ -11,6 +11,7 @@ angular.module('mathgame.app')
         @userName= "User"
         @processingAnswer = false
         @currentAnswer = ''
+        @showIncorrectAnswerNotice = false
         @userId = ''
         socket.on 'userId assigned', (id)=> @userId = id
         socket.waitForConnection()
@@ -18,7 +19,7 @@ angular.module('mathgame.app')
           socket.emit('joinGame', {gameId, userName: @userName}, @_onJoinResponse)
           socket.on('userJoined', @_onUserJoined)
           socket.on('userLeft', @_onUserLeft)
-          socket.on('answerGraded', @_onAnswerGraded)
+          socket.on('answerIncorrect', @_onAnswerIncorrect)
           socket.on('questionEnded', @_onQuestionEnded)
 
       _parseGame: (data) =>
@@ -43,17 +44,19 @@ angular.module('mathgame.app')
 
         @_parseGame(response)
 
-      _onAnswerGraded: (result) =>
+      _onAnswerIncorrect: =>
+        @showIncorrectAnswerNotice = true
         @_clearAnswerState()
 
-      _onQuestionEnded: (result) =>
+      _onQuestionEnded: (updatedQuestion) =>
         @_clearAnswerState()
-
+        @info.currentQuestion = updatedQuestion
 
     #### Public functions
       submitAnswer: =>
         if @processingAnswer then return
 
+        @showIncorrectAnswerNotice = false
         @processingAnswer = true
         answerData =
           gameId: gameId

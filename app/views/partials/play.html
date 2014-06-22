@@ -2,8 +2,8 @@
     <div class="col-sm-8 col-md-8" id="game-area">
         <h3>The Game</h3>
         <h5>The question is: </h5>
-        <div class="question-text" ng-bind="game.info.currentQuestion"></div>
-        <form>
+        <div class="question-text" ng-bind="game.info.currentQuestion.text"></div>
+        <form ng-show="!game.info.currentQuestion.hasBeenAnswered">
             <fieldset ng-disabled="game.processingAnswer">
                 <div class="form-group">
                     <label for="question-answer">Answer</label>
@@ -13,8 +13,16 @@
                     <button type="submit" class="btn btn-primary btn-lg" ng-click="game.submitAnswer()">Submit</button>
                 </div>
             </fieldset>
-
         </form>
+        <div ng-show="game.info.currentQuestion.hasBeenAnswered">
+            <div class="alert alert-success" >
+                {{game.info.currentQuestion.winner}} answered correctly with: {{game.info.currentQuestion.answer}}
+            </div>
+            <div><strong>Get ready for the next question!</strong></div>
+        </div>
+        <div class="alert alert-danger" ng-show="game.showIncorrectAnswerNotice" ng-cloak>
+            Oops!  That wasn't the right answer.  Feel free to try again.
+        </div>
     </div>
     <div class="col-sm-4 col-md-4" id="player-list">
         <h4>Players</h4>

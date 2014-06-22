@@ -141,7 +141,7 @@ describe('Game Repository', function(){
 
         var answerCorrectly = function(){
             return getGame().then(function(game){
-                return repo.answerCurrentQuestion(gameId, game.currentQuestion.answer)
+                return repo.answerCurrentQuestion(gameId, userId, game.currentQuestion.answer)
             });
         };
 
@@ -160,11 +160,25 @@ describe('Game Repository', function(){
             })
         });
 
+        it('should return an updated question when a correct answer is received', function(){
+            return answerCorrectly()
+            .then(function(result){
+                getGame().then(function(game){
+                    result.updatedQuestion.should.match({
+                        winner: userId,
+                        hasBeenAnswered: true,
+                        answer: game.currentQuestion.answer
+                    })
+                });
+            });
+        });
+
         it('should should mark the current question as answered when processing a correct answer', function(){
             return answerCorrectly()
             .then( getGame )
             .then( function(game){
                 game.currentQuestion.hasBeenAnswered.should.be.true;
+                game.currentQuestion.winner.should.equal(userId);
             })
         });
 

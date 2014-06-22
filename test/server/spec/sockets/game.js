@@ -136,6 +136,16 @@ describe('Game Socket', function () {
                 return socket.listeners['answerQuestion'](answerData);
             };
 
+            it('should send correct arguments when processing an answer', function(){
+                gameRepo.answerCurrentQuestion.returns( q({correct: false}) );
+                return sendAnswer()
+                .finally(function () {
+                    gameRepo.answerCurrentQuestion.should.have.been.calledWith(
+                        gameId, socket.id, answerData.answer
+                    );
+                });
+            });
+
             it('should emit wrong answer event when answer is resolved as incorrect', function () {
                 gameRepo.answerCurrentQuestion.returns( q({correct: false}) );
                 return sendAnswer()
@@ -147,12 +157,19 @@ describe('Game Socket', function () {
             });
 
             it('should emit questionEnded event when answer is resolved as correct', function() {
-                gameRepo.answerCurrentQuestion.returns( q({correct: true}) );
+                var updatedQuestion = {
+                    winner: 'winnerId',
+                    hasBeenAnswered: true
+                };
+                gameRepo.answerCurrentQuestion.returns( q({
+                    correct: true,
+                    updatedQuestion: updatedQuestion
+                }) );
                 return sendAnswer()
                 .finally( function(){
                     room.emit.should.have.been.calledWith(
                         'questionEnded',
-                        sinon.match({winner: socket.id})
+                        sinon.match(updatedQuestion)
                     );
                 });
             });

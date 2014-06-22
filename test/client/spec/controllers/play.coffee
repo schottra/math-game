@@ -83,7 +83,7 @@ describe 'Controller: PlayCtrl', () ->
       expectedListeners = [
         'userJoined'
         'userLeft'
-        'answerGraded'
+        'answerIncorrect'
         'questionEnded'
       ]
 
@@ -104,8 +104,19 @@ describe 'Controller: PlayCtrl', () ->
       invokeEvent 'userLeft', 'validUserId1'
       expect(scope.game.info.players).not.toContain jasmine.objectContaining({id: 'validUserId1'})
 
+    it 'should clear incorrect answer flag when submitting a new answer', ->
+      scope.game.showIncorrectAnswerNotice = true
+      scope.game.processingAnswer = false
+      scope.game.currentAnswer = 'someAnswer'
+      scope.game.submitAnswer()
+      expect(scope.game.showIncorrectAnswerNotice).toBe false
+
     describe 'when answering a question', ->
       beforeEach ->
+        gameData.currentQuestion =
+          hasBeenAnswered: false
+          text: "some question text"
+
         socket.emit.calls.reset()
         scope.game.currentAnswer = 'theAnswer'
         scope.game.submitAnswer()
@@ -121,16 +132,29 @@ describe 'Controller: PlayCtrl', () ->
         scope.game.submitAnswer()
         expect(socket.emit.calls.count()).toEqual 1
 
-      it 'should clear processing state and current answer once answer has been graded', ->
+      it 'should clear processing state and current answer if answer is incorrect', ->
         expect(scope.game.processingAnswer).toBe true
-        invokeEvent('answerGraded')
+        invokeEvent('answerIncorrect')
         expect(scope.game.processingAnswer).toBe false
         expect(scope.game.currentAnswer).toEqual ''
 
+      it 'should set a flag when answer is incorrect', ->
+        invokeEvent('answerIncorrect')
+        expect(scope.game.showIncorrectAnswerNotice).toBe true
+
       it 'should clear processing state and currentAnswer when the question ends', ->
-        invokeEvent('questionEnded')
+        invokeEvent('questionEnded', {winner: 'winnerId'})
         expect(scope.game.processingAnswer).toBe false
         expect(scope.game.currentAnswer).toBe ''
+
+      it 'should update game infomation when the question ends', ->
+        updatedQuestion =
+          winner: 'winnerId'
+          hasBeenAnswered: true
+          text: 'someText'
+          answer: 'theAnswer'
+        invokeEvent('questionEnded', updatedQuestion)
+        expect(scope.game.info.currentQuestion).toEqual updatedQuestion
 
 
 
