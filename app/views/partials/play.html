@@ -6,10 +6,10 @@
         <form>
             <div class="form-group">
                 <label for="question-answer">Answer</label>
-                <input placeholder="Enter your answer" id="question-answer" type="text" class="form-control input-lg">
+                <input placeholder="Enter your answer" ng-model="game.currentAnswer" id="question-answer" type="text" class="form-control input-lg">
             </div>
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+            <div class="text-center" ng-disable="game.processingAnswer">
+                <button type="submit" class="btn btn-primary btn-lg" ng-click="game.submitAnswer(game.currentAnswer)">Submit</button>
             </div>
         </form>
     </div>

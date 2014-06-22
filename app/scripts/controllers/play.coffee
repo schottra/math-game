@@ -18,11 +18,14 @@ angular.module('mathGameApp')
       constructor: ->
         @info = {}
         @userName= "User"
+        @processingAnswer = false
+        @currentAnswer = ''
         openSocket()
         .then =>
           socket.emit('joinGame', {gameId, userName: @userName}, @_onJoinResponse)
           socket.on('userJoined', @_onUserJoined)
           socket.on('userLeft', @_onUserLeft)
+          socket.on('answerGraded', @_onAnswerGraded)
 
       _parseGame: (data) =>
         @info = data
@@ -42,6 +45,19 @@ angular.module('mathGameApp')
         if response instanceof Error then return $location.url('/')
 
         $timeout( => @_parseGame(response) )
+
+      _onAnswerGraded: (result) =>
+        @processingAnswer = false
+        @currentAnswer = ''
+
+      submitAnswer: (answer) =>
+        if @processingAnswer then return
+
+        @processingAnswer = true
+        answerData =
+          gameId: gameId
+          answer: answer
+        socket.emit('answerQuestion', answerData )
 
 
     ctrl = new PlayController()
