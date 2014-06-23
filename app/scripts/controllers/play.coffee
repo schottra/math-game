@@ -21,6 +21,7 @@ angular.module('mathgame.app')
           socket.on('userLeft', @_onUserLeft)
           socket.on('answerIncorrect', @_onAnswerIncorrect)
           socket.on('questionEnded', @_onQuestionEnded)
+          socket.on('newQuestion', @_onNewQuestion)
 
       _parseGame: (data) =>
         @info = data
@@ -51,6 +52,9 @@ angular.module('mathgame.app')
       _onQuestionEnded: (updatedQuestion) =>
         @_clearAnswerState()
         @info.currentQuestion = updatedQuestion
+
+      _onNewQuestion: (newQuestion) =>
+        @info.currentQuestion = newQuestion
 
     #### Public functions
       submitAnswer: =>

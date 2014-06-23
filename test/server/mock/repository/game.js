@@ -9,6 +9,7 @@ module.exports = function(){
         addUserToGame: sinon.stub().returns(q()),
         removeUserFromGame: sinon.stub().returns(q()),
         getGame: sinon.stub().returns(q()),
-        answerCurrentQuestion: sinon.stub().returns(q())
+        answerCurrentQuestion: sinon.stub().returns(q()),
+        newQuestion: sinon.stub().returns(q())
     }
 };

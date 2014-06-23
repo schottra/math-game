@@ -85,6 +85,7 @@ describe 'Controller: PlayCtrl', () ->
         'userLeft'
         'answerIncorrect'
         'questionEnded'
+        'newQuestion'
       ]
 
       expect(socket.on).toHaveBeenCalledWith(eName, jasmine.any(Function)) for eName in expectedListeners
@@ -110,6 +111,13 @@ describe 'Controller: PlayCtrl', () ->
       scope.game.currentAnswer = 'someAnswer'
       scope.game.submitAnswer()
       expect(scope.game.showIncorrectAnswerNotice).toBe false
+
+    it 'should update current question when newQuestion event is received', ->
+      newQuestion =
+        text: 'question text'
+        hasBeenAnswered: false
+      invokeEvent 'newQuestion', newQuestion
+      expect(scope.game.info.currentQuestion).toEqual newQuestion
 
     describe 'when answering a question', ->
       beforeEach ->

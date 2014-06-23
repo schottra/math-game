@@ -125,13 +125,36 @@ describe('Game Socket', function () {
 
         describe('when processing answers', function () {
             var answerData = {};
+            var clock = {};
             beforeEach(function(done){
                 answerData = {
                     gameId: gameId,
                     answer: 'theAnswer'
                 };
+                gameRepo.newQuestion.returns( q({
+                    clientVisibleData: {
+                    }
+                }));
+                clock = sinon.useFakeTimers();
                 joinGame().done(done);
             });
+
+            afterEach(function(){
+                clock.restore();
+            });
+
+            var setupCorrectAnswer = function(){
+                var updatedQuestion = {
+                    winner: 'winnerId',
+                    hasBeenAnswered: true
+                };
+                gameRepo.answerCurrentQuestion.returns( q({
+                    correct: true,
+                    updatedQuestion: updatedQuestion
+                }) );
+                return updatedQuestion;
+            };
+
             var sendAnswer = function () {
                 return socket.listeners['answerQuestion'](answerData);
             };
@@ -157,14 +180,7 @@ describe('Game Socket', function () {
             });
 
             it('should emit questionEnded event when answer is resolved as correct', function() {
-                var updatedQuestion = {
-                    winner: 'winnerId',
-                    hasBeenAnswered: true
-                };
-                gameRepo.answerCurrentQuestion.returns( q({
-                    correct: true,
-                    updatedQuestion: updatedQuestion
-                }) );
+                var updatedQuestion = setupCorrectAnswer();
                 return sendAnswer()
                 .finally( function(){
                     room.emit.should.have.been.calledWith(
@@ -181,7 +197,37 @@ describe('Game Socket', function () {
                     room.emit.should.not.have.been.calledWithMatch('questionEnded');
                     socket.emit.should.not.have.been.calledWithMatch('answerIncorrect');
                 });
-            })
+            });
+
+            it('should schedule a new question after current question has been answered', function(){
+                setupCorrectAnswer();
+                return sendAnswer()
+                .finally( function(){
+                    clock.tick(10000);
+                    gameRepo.newQuestion.should.have.been.calledWith(gameId);
+                });
+            });
+
+            //TODO: This can't be tested reliably until some of the functionality in the game socket is broken
+            // up and more accessible from tests
+//            it('should use client visible data when emitting a new question', function () {
+//                var filteredQuestion = {
+//                    text: 'theText',
+//                    hasBeenAnswered: false
+//                };
+//                var updatedGame = {
+//                    clientVisibleData: {
+//                        currentQuestion: filteredQuestion
+//                    }
+//                };
+//                gameRepo.newQuestion.returns( q(updatedGame) );
+//                setupCorrectAnswer();
+//                return sendAnswer()
+//                .finally( function(){
+//                    clock.tick(10000);
+//                    room.emit.should.have.been.calledWithMatch('newQuestion', filteredQuestion);
+//                });
+//            });
 
         });
     });
