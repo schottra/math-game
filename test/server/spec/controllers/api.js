@@ -13,9 +13,9 @@ describe('POST /api/game', function() {
     beforeEach(function(){
         sandbox = sinon.sandbox.create();
         returnedGame = {
-            clientVisibleData: {
+            getClientVisibleData: function(){ return {
                 id: 'validGameId'
-            }
+            };}
         };
     });
 
@@ -53,7 +53,7 @@ describe('POST /api/game', function() {
         request(app)
         .post('/api/game')
         .end(function(err,res) {
-            res.body.should.deep.equal(returnedGame.clientVisibleData);
+            res.body.should.deep.equal(returnedGame.getClientVisibleData());
             done();
         });
 

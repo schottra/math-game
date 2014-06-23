@@ -62,7 +62,7 @@ describe('Game Socket', function () {
         beforeEach(connectSocket);
         beforeEach(function () {
             gameData = {
-                clientVisibleData: {id: 'validId'}
+                getClientVisibleData: function(){ return {id: 'validId'}; }
             };
             gameRepo.addUserToGame = sinon.stub().returns( q(gameData) );
             gameId = 'validGameId';
@@ -86,7 +86,7 @@ describe('Game Socket', function () {
         it('should respond with game data when a user joins', function () {
             return joinGame()
             .finally(function(){
-                joinCallback.should.have.been.calledWith(gameData.clientVisibleData);
+                joinCallback.should.have.been.calledWith(gameData.getClientVisibleData());
             });
         });
 
@@ -132,8 +132,7 @@ describe('Game Socket', function () {
                     answer: 'theAnswer'
                 };
                 gameRepo.newQuestion.returns( q({
-                    clientVisibleData: {
-                    }
+                    getClientVisibleData: function(){ return {};}
                 }));
                 clock = sinon.useFakeTimers();
                 joinGame().done(done);
