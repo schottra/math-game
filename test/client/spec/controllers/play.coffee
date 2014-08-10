@@ -59,9 +59,11 @@ describe 'Controller: PlayCtrl', () ->
     )
 
   it 'should handle failed game join message', ->
-    socket.emit.and.callFake (event, data, cb) -> cb(new Error())
+    socket.emit.and.callFake (event, data, cb) -> cb({error: 'gameNotFound'})
     connect()
     expect($location.url()).toBe '/'
+
+    it 'should redirect to home page when trying to join a game that does not exist', ->
 
   describe 'after joining', ->
     players = []

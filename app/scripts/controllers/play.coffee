@@ -41,8 +41,7 @@ angular.module('mathgame.app')
           if player.id is userId then return @info.players.splice(i,1)
 
       _onJoinResponse: (response)=>
-        if response instanceof Error then return $location.url('/')
-
+        if response?.error is 'gameNotFound' then $location.url('/')
         @_parseGame(response)
 
       _onAnswerIncorrect: =>

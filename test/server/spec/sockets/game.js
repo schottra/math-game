@@ -94,7 +94,7 @@ describe('Game Socket', function () {
             gameRepo.addUserToGame.returns(q.reject());
             return joinGame()
             .finally(function(){
-                joinCallback.should.have.been.calledWith(sinon.match.instanceOf(Error));
+                joinCallback.should.have.been.calledWith({error: 'gameNotFound'});
             });
         });
 
